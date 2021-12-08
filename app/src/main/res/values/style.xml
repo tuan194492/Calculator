@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="testStyle">
+
+        <item name="android:shape">rectangle</item>
+        <item name="android:strokeWidth"> 2 </item>
+        <item name="android:strokeColor">#000000</item>
+    </style>
+
+</resources>
