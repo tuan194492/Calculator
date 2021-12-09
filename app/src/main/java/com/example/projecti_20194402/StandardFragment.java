@@ -69,6 +69,7 @@ public class StandardFragment extends Fragment implements View.OnClickListener {
     }
     public String beautifyNumber(String s) {
         if (s.equals("") || s.equals(" ")) return s;
+        if (s.charAt(s.length() - 1) == '.') return beautifyNumber(s.substring(0, s.length() - 1)) + ".";
         if (Float.parseFloat(s) == 0.0f) {
             return "0";
         }
@@ -81,12 +82,12 @@ public class StandardFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         System.out.println(calculator.getState().getCurrentNumber());
-        if (v.getId() == R.id.btnC) {
+        if (v.getId() == R.id.btnCE) {
             System.out.println("del");
-            calculator.btnCclick();
+            calculator.btnCEclick();
             updateDisplay();
         }
-        else if (v.getId() == R.id.btnCE) {
+        else if (v.getId() == R.id.btnC) {
             calculator.clear();
             updateDisplay();
         }
@@ -121,6 +122,11 @@ public class StandardFragment extends Fragment implements View.OnClickListener {
         || v.getId() == R.id.btnDiv) {
             if (v.getId() == R.id.btnCompute) {
                 if (calculator.getState().getScope() == SCOPE.BEFORE_COMPUTE && calculator.getState().getOperator() == ' ') return;
+                if (calculator.getState().getScope() == SCOPE.BEFORE_COMPUTE && calculator.getState().getOperator() != ' ') {
+                    String tmp = calculator.getState().getPrevNumber();
+                    calculator.getState().setPrevNumber(calculator.getState().getCurrentNumber());
+                    calculator.getState().setCurrentNumber(tmp);
+                }
                 prevExpression.setText(beautifyNumber(calculator.getState().getPrevNumber()) + " " + calculator.getState().getOperator() + " " + beautifyNumber(calculator.getState().getCurrentNumber()) + " = ");
                 calculator.compute();
                 curNum.setText(beautifyNumber(calculator.getState().getCurrentNumber()));

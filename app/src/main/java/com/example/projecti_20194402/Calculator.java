@@ -94,7 +94,7 @@ public class Calculator {
     public void root() {
         state.setCurrentNumber(String.valueOf(Float.parseFloat(state.getCurrentNumber()) * Float.parseFloat(state.getCurrentNumber())));
     }
-    public void btnCclick() {
+    public void btnCEclick() {
         state.setCurrentNumber("0");
     }
     public void Inverse() {

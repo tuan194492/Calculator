@@ -28,7 +28,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getView().findViewById(R.id.imageButton4).setOnClickListener(new View.OnClickListener() {
+        getView().findViewById(R.id.ceBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 System.out.println("Hello world cai cc");
