@@ -54,6 +54,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         getView().findViewById(R.id.num7).setOnClickListener(this);
         getView().findViewById(R.id.num8).setOnClickListener(this);
         getView().findViewById(R.id.num9).setOnClickListener(this);
+        getView().findViewById(R.id.dotBtn).setOnClickListener(this);
         getView().findViewById(R.id.cBtn).setOnClickListener(this);
         getView().findViewById(R.id.eBtn).setOnClickListener(this);
         getView().findViewById(R.id.deleteBtn).setOnClickListener(this);
@@ -64,6 +65,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         getView().findViewById(R.id.divBtn).setOnClickListener(this);
         getView().findViewById(R.id.dongNgoac).setOnClickListener(this);
         getView().findViewById(R.id.moNgoac).setOnClickListener(this);
+        // Đã xong + - * / đóng mở ngoặc với cả số nguyên và số thực
         getView().setOnClickListener(this);
 
         expressionTextView = getView().findViewById(R.id.prevExpres);
@@ -153,8 +155,17 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                     return;
                 }
             } else if (calculator.getScope() == SCOPE.NGOAC) {
-                calculator.setCurrentNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.getExpression().lastIndexOf("(")))));
-                calculator.setExpression(calculator.getExpression() + v.getContentDescription());
+                if (calculator.getExpression().charAt(calculator.getExpression().length() - 1) == '(') {
+                    calculator.setExpression(calculator.getExpression() + calculator.getCurrentNumber());
+                    calculator.setOperator(v.getContentDescription().charAt(0));
+                } else {
+                    try {
+                        calculator.setCurrentNumber(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
+                    } catch (Exception e) {
+                        calculator.setCurrentNumber(currentNumberTextView.getText().toString());
+                    }
+                    calculator.setOperator(v.getContentDescription().charAt(0));
+                }
             }
             calculator.setScope(SCOPE.OPERATOR);
             updateDisplay();
@@ -194,7 +205,20 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         }
         // dong ngoac va mo ngoac
         if (v.getId() == R.id.moNgoac || v.getId() == R.id.dongNgoac) {
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
+                String cur = calculator.getCurrentNumber();
+                calculator.buttonCclick();
+                calculator.setCurrentNumber(cur);
+            }
             if (v.getId() == R.id.moNgoac) {
+                if (calculator.getScope() == SCOPE.NGOAC && ngoac == 0) {
+                    calculator.buttonCclick();
+                }
+                if (calculator.getScope() == SCOPE.OPERATOR) {
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator());
+                    calculator.setCurrentNumber("0");
+                    calculator.setOperator(' ');
+                }
                 calculator.setExpression(calculator.getExpression() + "(");
                 ngoac++;
                 calculator.setScope(SCOPE.NGOAC);
@@ -204,7 +228,20 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                 calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber() )+ ")");
                 calculator.setOperator(' ');
                 expressionTextView.setText(calculator.getExpression());
-                currentNumberTextView.setText(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.getExpression().lastIndexOf("(")))));
+                String s = calculator.getExpression();
+                System.out.println(s);
+                int vitri = 0;
+                int tmp = 1;
+                for (int i = s.length() - 2; i >= 0; i--) {
+                    if (s.charAt(i) == ')') tmp++;
+                    if (s.charAt(i) == '(') tmp--;
+                    if (tmp == 0) {
+                        vitri = i;
+                        break;
+                    }
+                }
+                System.out.println(calculator.getExpression().substring(vitri));
+                currentNumberTextView.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(vitri)))));
                 ngoac--;
                 calculator.setScope(SCOPE.NGOAC);
                 return;
