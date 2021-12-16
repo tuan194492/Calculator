@@ -65,6 +65,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         getView().findViewById(R.id.divBtn).setOnClickListener(this);
         getView().findViewById(R.id.dongNgoac).setOnClickListener(this);
         getView().findViewById(R.id.moNgoac).setOnClickListener(this);
+        getView().findViewById(R.id.exponentBtn).setOnClickListener(this);
         // Đã xong + - * / đóng mở ngoặc với cả số nguyên và số thực
         getView().setOnClickListener(this);
 
@@ -127,6 +128,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                 || v.getId() == R.id.num9
                 || v.getId() == R.id.dotBtn) {
             System.out.println("Press number");
+            if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')' ) return;
             if (calculator.getCurrentNumber().contains(".") && v.getId() == R.id.dotBtn) return;
             if (calculator.getCurrentNumber().contains(".") == false && v.getId() == R.id.num0 && Float.parseFloat(calculator.getCurrentNumber()) == 0.0f) return;
             calculator.appendNumber(v.getContentDescription().toString());
@@ -136,7 +138,8 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         if (   v.getId() == R.id.addBtn
             || v.getId() == R.id.subBtn
             || v.getId() == R.id.mulBtn
-            || v.getId() == R.id.divBtn) {
+            || v.getId() == R.id.divBtn
+            || v.getId() == R.id.exponentBtn) {
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 calculator.setExpression(calculator.getCurrentNumber());
                 calculator.setOperator(v.getContentDescription().charAt(0));
@@ -225,7 +228,11 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
             }
             if (v.getId() == R.id.dongNgoac) {
                 if (ngoac == 0) return;
-                calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber() )+ ")");
+                if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') {
+                    calculator.setExpression(calculator.getExpression() + ")");
+                } else {
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber() )+ ")");
+                }
                 calculator.setOperator(' ');
                 expressionTextView.setText(calculator.getExpression());
                 String s = calculator.getExpression();

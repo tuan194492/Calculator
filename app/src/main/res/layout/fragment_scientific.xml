@@ -442,7 +442,7 @@
             android:contentDescription="sqrt"
             android:scaleType="fitCenter"
             android:src="@drawable/root"
-            app:layout_constraintBottom_toTopOf="@+id/xyBtn"
+            app:layout_constraintBottom_toTopOf="@+id/exponentBtn"
             app:layout_constraintEnd_toStartOf="@+id/moNgoac"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -523,16 +523,16 @@
             app:layout_constraintTop_toBottomOf="@+id/modBtn" />
 
         <ImageButton
-            android:id="@+id/xyBtn"
+            android:id="@+id/exponentBtn"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="1dp"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="1dp"
             android:layout_marginBottom="1dp"
-            android:contentDescription="x^y"
+            android:contentDescription="^"
             android:scaleType="fitCenter"
-            android:src="@drawable/onex"
+            android:src="@drawable/exponent"
             app:layout_constraintBottom_toTopOf="@+id/x10btn"
             app:layout_constraintEnd_toStartOf="@+id/num7"
             app:layout_constraintHorizontal_bias="0.5"
@@ -554,7 +554,7 @@
             app:layout_constraintEnd_toStartOf="@+id/num4"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/xyBtn" />
+            app:layout_constraintTop_toBottomOf="@+id/exponentBtn" />
 
         <Button
             android:id="@+id/logBtn"
@@ -671,7 +671,7 @@
             app:layout_constraintBottom_toTopOf="@+id/num4"
             app:layout_constraintEnd_toStartOf="@+id/num8"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/xyBtn"
+            app:layout_constraintStart_toEndOf="@+id/exponentBtn"
             app:layout_constraintTop_toBottomOf="@+id/moNgoac" />
 
         <ImageButton
