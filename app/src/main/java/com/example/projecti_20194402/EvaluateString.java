@@ -69,7 +69,7 @@ public class EvaluateString {
             else if (tokens[i] == '+' ||
                     tokens[i] == '-' ||
                     tokens[i] == '*' ||
-                    tokens[i] == '/')
+                    tokens[i] == '/' || tokens[i] == '^')
             {
                 // While top of 'ops' has same
                 // or greater precedence to current
@@ -109,6 +109,10 @@ public class EvaluateString {
     {
         if (op2 == '(' || op2 == ')')
             return false;
+        if (op1 == '^') {
+            if (op2 == '^') return true;
+            else return false;
+        }
         if ((op1 == '*' || op1 == '/') &&
                 (op2 == '+' || op2 == '-'))
             return false;
@@ -136,6 +140,8 @@ public class EvaluateString {
                             UnsupportedOperationException(
                             "Cannot divide by zero");
                 return (float)a / b;
+            case '^':
+                return (float) Math.pow(a, b);
         }
         return 0;
     }
