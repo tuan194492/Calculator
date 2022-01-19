@@ -71,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 fragment = new ScientificFragment();
                 break;
+            case 2:
+                fragment = new ProgrammerFragment();
+                break;
             default:
                 fragment = new StandardFragment();
                 break;
