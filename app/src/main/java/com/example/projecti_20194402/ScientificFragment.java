@@ -11,8 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Stack;
-
 
 public class ScientificFragment extends Fragment implements View.OnClickListener{
     private ScientificCalculator calculator;
@@ -42,6 +40,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                 System.out.println("Hello world cai cc");
             }
         });
+        // Add event listener
         getView().findViewById(R.id.trinoBtn).setOnClickListener(this);
         getView().findViewById(R.id.functionBtn).setOnClickListener(this);
         getView().findViewById(R.id.num0).setOnClickListener(this);
@@ -66,9 +65,15 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         getView().findViewById(R.id.dongNgoac).setOnClickListener(this);
         getView().findViewById(R.id.moNgoac).setOnClickListener(this);
         getView().findViewById(R.id.exponentBtn).setOnClickListener(this);
+        getView().findViewById(R.id.absBtn).setOnClickListener(this);
+        getView().findViewById(R.id.logBtn).setOnClickListener(this);
+        getView().findViewById(R.id.ln2Btn).setOnClickListener(this);
+        getView().findViewById(R.id.squareBtn).setOnClickListener(this);
+        getView().findViewById(R.id.rootBtn).setOnClickListener(this);
+        getView().findViewById(R.id.inverseBtn).setOnClickListener(this);
         // Đã xong + - * / đóng mở ngoặc với cả số nguyên và số thực
+        getView().findViewById(R.id.absBtn).setOnClickListener(this);
         getView().setOnClickListener(this);
-
         expressionTextView = getView().findViewById(R.id.prevExpres);
         currentNumberTextView = getView().findViewById(R.id.curNum);
 
@@ -79,6 +84,11 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
+        if (calculator.getCurrentNumber().equals("NaN") || calculator.getCurrentNumber().contains("Infinity")) {
+            calculator.setScope(SCOPE.BEFORE_COMPUTE);
+        }
+        System.out.println(calculator.getExpression());
+        System.out.println(calculator.getS_Expression());
         View trinoView = getView().findViewById(R.id.trinoView);
         View functionView = getView().findViewById(R.id.functionView);
         if (v.getId() == R.id.trinoBtn) {
@@ -109,11 +119,13 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
             else
                 calculator.buttonCEclick();
             updateDisplay();
+            return;
         }
         else if (v.getId() == R.id.deleteBtn) {
-            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) return;
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE || calculator.getScope() == SCOPE.PHEPTOANDON || calculator.getScope() == SCOPE.OPERATOR || calculator.getScope() == SCOPE.NGOAC) return;
             calculator.buttonDel();
             updateDisplay();
+            return;
         }
         // NUMBER
         if (    v.getId() == R.id.num0
@@ -131,10 +143,12 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
             if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')' ) return;
             if (calculator.getCurrentNumber().contains(".") && v.getId() == R.id.dotBtn) return;
             if (calculator.getCurrentNumber().contains(".") == false && v.getId() == R.id.num0 && Float.parseFloat(calculator.getCurrentNumber()) == 0.0f) return;
+            if (calculator.getScope() == SCOPE.PHEPTOANDON) return;
             calculator.appendNumber(v.getContentDescription().toString());
             updateDisplay();
+            return;
         }
-
+        // Các phép toán 2
         if (   v.getId() == R.id.addBtn
             || v.getId() == R.id.subBtn
             || v.getId() == R.id.mulBtn
@@ -146,11 +160,12 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                 calculator.setCurrentNumber("0");
             } else if (calculator.getScope() == SCOPE.OPERATOR) {
                 calculator.setOperator(v.getContentDescription().charAt(0));
-            } else if (calculator.getScope() == SCOPE.NUMBER) {
+            } else if (calculator.getScope() == SCOPE.NUMBER ) {
                 calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
                 calculator.setOperator(v.getContentDescription().charAt(0));
                 if (v.getId() == R.id.addBtn || v.getId() == R.id.subBtn) {
-                    expressionTextView.setText(calculator.getExpression() + " " + calculator.getOperator());
+                    expressionTextView.setText(calculator.getS_Expression() + " " + calculator.getOperator());
                     if (ngoac == 0) {
                         currentNumberTextView.setText(beautifyNumber(String.valueOf(calculator.compute())));
                     }
@@ -160,6 +175,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
             } else if (calculator.getScope() == SCOPE.NGOAC) {
                 if (calculator.getExpression().charAt(calculator.getExpression().length() - 1) == '(') {
                     calculator.setExpression(calculator.getExpression() + calculator.getCurrentNumber());
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getCurrentNumber());
                     calculator.setOperator(v.getContentDescription().charAt(0));
                 } else {
                     try {
@@ -169,44 +185,81 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                     }
                     calculator.setOperator(v.getContentDescription().charAt(0));
                 }
+            } else if (calculator.getScope() == SCOPE.PHEPTOANDON) {
+                calculator.setOperator(v.getContentDescription().charAt(0));
             }
             calculator.setScope(SCOPE.OPERATOR);
             updateDisplay();
+            return;
         }
-
+        // Ấn nút =
         if (v.getId() == R.id.computeBtn) {
-            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
+            if (ngoac > 0) {
+                calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                while (ngoac > 0) {
+                    calculator.setExpression(calculator.getExpression() + ")");
+                    calculator.setS_Expression(calculator.getS_Expression() + ")");
+                    ngoac--;
+                }
+                calculator.setScope(SCOPE.NGOAC);
+                calculator.setCurrentNumber("0");
+                calculator.setOperator(' ');
+            }
 
+
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
+                calculator.setExpression(beautifyNumber(calculator.getCurrentNumber()));
+                calculator.setS_Expression(calculator.getS_Expression());
+                expressionTextView.setText(calculator.getS_Expression() + "=");
+                calculator.setScope(SCOPE.BEFORE_COMPUTE);
+                return;
             } else if (calculator.getScope() == SCOPE.OPERATOR) {
+                calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                calculator.setOperator(' ');
+                expressionTextView.setText(calculator.getS_Expression() + "=");
+                calculator.setCurrentNumber(String.valueOf(calculator.cal(calculator.getExpression())));
+                currentNumberTextView.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
+                calculator.setScope(SCOPE.BEFORE_COMPUTE);
+                return;
 
             } else if (calculator.getScope() == SCOPE.NUMBER) {
                 calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
                 float res = calculator.compute();
                 calculator.setOperator(' ');
                 calculator.setCurrentNumber(beautifyNumber(String.valueOf(res)));
-                expressionTextView.setText(calculator.getExpression() + "=");
+                expressionTextView.setText(calculator.getS_Expression() + "=");
+                calculator.setCurrentNumber(String.valueOf(calculator.cal(calculator.getExpression())));
                 currentNumberTextView.setText(beautifyNumber(calculator.getCurrentNumber()));
                 calculator.setScope(SCOPE.BEFORE_COMPUTE);
 
                 return;
 
             } else if (calculator.getScope() == SCOPE.NGOAC) {
-                while (ngoac > 0) {
-                    calculator.setExpression(calculator.getExpression() + ")");
-                }
                 float res = calculator.compute();
                 calculator.setOperator(' ');
                 calculator.setCurrentNumber(beautifyNumber(String.valueOf(res)));
-                expressionTextView.setText(calculator.getExpression() + "=");
+                expressionTextView.setText(calculator.getS_Expression() + "=");
                 currentNumberTextView.setText(beautifyNumber(calculator.getCurrentNumber()));
                 calculator.setScope(SCOPE.BEFORE_COMPUTE);
 
                 return;
+            } else if (calculator.getScope() == SCOPE.PHEPTOANDON) {
+                System.out.println(calculator.getExpression());
+                System.out.println(calculator.getS_Expression());
+                calculator.setCurrentNumber(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
+                expressionTextView.setText(calculator.getS_Expression() + " =");
+                currentNumberTextView.setText(calculator.getCurrentNumber());
+                calculator.setScope(SCOPE.BEFORE_COMPUTE);
+                return;
             }
             calculator.setScope(SCOPE.BEFORE_COMPUTE);
             updateDisplay();
+            return;
         }
-        // dong ngoac va mo ngoac
+        // Đóng mở ngoặc
         if (v.getId() == R.id.moNgoac || v.getId() == R.id.dongNgoac) {
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 String cur = calculator.getCurrentNumber();
@@ -214,39 +267,37 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                 calculator.setCurrentNumber(cur);
             }
             if (v.getId() == R.id.moNgoac) {
+                if (calculator.getScope() == SCOPE.NUMBER && calculator.getExpression().equals("") == false) return;
                 if (calculator.getScope() == SCOPE.NGOAC && ngoac == 0) {
                     calculator.buttonCclick();
                 }
                 if (calculator.getScope() == SCOPE.OPERATOR) {
                     calculator.setExpression(calculator.getExpression() + calculator.getOperator());
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator());
                     calculator.setCurrentNumber("0");
                     calculator.setOperator(' ');
                 }
                 calculator.setExpression(calculator.getExpression() + "(");
+                calculator.setS_Expression(calculator.getS_Expression() + "(" );
+                System.out.println(calculator.getExpression());
                 ngoac++;
                 calculator.setScope(SCOPE.NGOAC);
             }
             if (v.getId() == R.id.dongNgoac) {
                 if (ngoac == 0) return;
-                if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') {
+                if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')'
+                || calculator.getScope() == SCOPE.PHEPTOANDON) {
                     calculator.setExpression(calculator.getExpression() + ")");
+                    calculator.setS_Expression(calculator.getS_Expression() + ")");
                 } else {
                     calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber() )+ ")");
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber() )+ ")");
                 }
                 calculator.setOperator(' ');
-                expressionTextView.setText(calculator.getExpression());
+                expressionTextView.setText(calculator.getS_Expression());
                 String s = calculator.getExpression();
                 System.out.println(s);
-                int vitri = 0;
-                int tmp = 1;
-                for (int i = s.length() - 2; i >= 0; i--) {
-                    if (s.charAt(i) == ')') tmp++;
-                    if (s.charAt(i) == '(') tmp--;
-                    if (tmp == 0) {
-                        vitri = i;
-                        break;
-                    }
-                }
+                int vitri = calculator.findLastSubExpression(s);
                 System.out.println(calculator.getExpression().substring(vitri));
                 currentNumberTextView.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(vitri)))));
                 ngoac--;
@@ -254,21 +305,106 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                 return;
             }
             updateDisplay();
+            return;
+        }
+        // Các phép toán một ngôi
+
+        /*
+            SCOPE = NUMBER => Áp dụng lên current number
+            SCOPE = Operator =>  Áp dụng lên current number
+            SCOPE = Ngoặc => mở ngoặc: current number
+                            Đóng ngoặc: biểu thức ngoặc cuối cùng
+         */
+        else {
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
+                calculator.setS_Expression("");
+                calculator.setExpression("");
+            }
+            if (calculator.getCurrentNumber().equals("NaN") || calculator.getCurrentNumber().contains("Infinity")) {
+                return;
+            }
+            if (calculator.getScope() == SCOPE.NGOAC) {
+                if (calculator.getExpression().charAt(calculator.getExpression().length() - 1) == '(') return;
+                else if (calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') {
+                    String addIn = new String("");
+                    switch (v.getId()) {
+                        case R.id.absBtn:
+                            addIn = "abs";
+                            break;
+                        case R.id.logBtn:
+                            addIn = "log";
+                            break;
+                        case R.id.ln2Btn:
+                            addIn = "ln";
+                            break;
+                        case R.id.inverseBtn:
+                            addIn = "inverse";
+                            break;
+                        case R.id.rootBtn:
+                            addIn = "sqrt";
+                            break;
+                    }
+                    String curNum =  beautifyNumber(String.valueOf(calculator.unaryOperationCal(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression()))))), addIn)));
+                    calculator.setExpression(calculator.getExpression().substring(0, calculator.findLastSubExpression(calculator.getExpression()))
+                            + calculator.unaryOperationCal(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression()))))), addIn));
+                    calculator.setS_Expression(calculator.getS_Expression().substring(0, calculator.findLastSubExpression(calculator.getS_Expression()))
+                            + addIn + calculator.getS_Expression().substring(calculator.findLastSubExpression(calculator.getS_Expression())));
+                    calculator.setCurrentNumber(curNum);
+                    calculator.setScope(SCOPE.PHEPTOANDON);
+//                    String curNum =  beautifyNumber(String.valueOf(calculator.unaryOperationCal(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression()))))), addIn)));
+//                    System.out.println(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression())));
+//                    System.out.println(calculator.getS_Expression().substring(0, calculator.findLastSubExpression(calculator.getS_Expression())) + "ln" + calculator.getS_Expression().substring(calculator.findLastSubExpression(calculator.getS_Expression())));
+//                    System.out.println(calculator.getExpression().substring(0, calculator.findLastSubExpression(calculator.getExpression())) + curNum);
+//                    calculator.setExpression(calculator.getExpression().substring(0, calculator.findLastSubExpression(calculator.getExpression()))
+//                            + calculator.unaryOperationCal(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression()))))), "ln"));
+//                    calculator.setS_Expression(calculator.getS_Expression().substring(0, calculator.findLastSubExpression(calculator.getS_Expression()))
+//                            + "ln" + calculator.getS_Expression().substring(calculator.findLastSubExpression(calculator.getS_Expression())));
+//                    calculator.setCurrentNumber(curNum);
+//                    calculator.setScope(SCOPE.PHEPTOANDON);
+                    //                    System.out.println(calculator.getExpression().substring(0, calculator.findLastSubExpression(calculator.getExpression()))
+//                            + calculator.unaryOperationCal(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression()))))), "ln"));
+//                    System.out.println(calculator.getS_Expression().substring(0, calculator.findLastSubExpression(calculator.getS_Expression())) + "ln" + calculator.getS_Expression().substring(calculator.findLastSubExpression(calculator.getS_Expression())));
+                    updateDisplay();
+                    return;
+                }
+            }
+            switch (v.getId()) {
+                case R.id.absBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "abs(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "abs"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.logBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "log(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "log"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.ln2Btn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "ln(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "ln"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.inverseBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "1/(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "inverse"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.rootBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "sqrt(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "sqrt"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+            }
+            calculator.setCurrentNumber(beautifyNumber(String.valueOf(calculator.unaryOperationCal(calculator.getCurrentNumber(), v.getContentDescription().toString()))));
+            currentNumberTextView.setText(calculator.getCurrentNumber());
+            calculator.setOperator(' ');
+            calculator.setScope(SCOPE.PHEPTOANDON);
         }
 
-//        System.out.println("Hello word " + v.getContentDescription());
-
 
     }
-
-    public void compute() {
-        float res = calculator.compute();
-        calculator.setCurrentNumber(beautifyNumber(calculator.getCurrentNumber()));
-        currentNumberTextView.setText(calculator.getCurrentNumber());
-    }
-
     public void updateDisplay() {
-        expressionTextView.setText(calculator.getExpression() + " " + calculator.getOperator());
+        expressionTextView.setText(calculator.getS_Expression() + " " + calculator.getOperator());
         currentNumberTextView.setText(beautifyNumber(calculator.getCurrentNumber()));
 
     }

@@ -347,7 +347,7 @@
             android:layout_marginTop="1dp"
             android:layout_marginEnd="1dp"
             android:layout_marginBottom="1dp"
-            android:contentDescription="square"
+            android:contentDescription="sqr"
             android:src="@drawable/square"
             app:layout_constraintBottom_toTopOf="@+id/rootBtn"
             app:layout_constraintEnd_toStartOf="@+id/inverseBtn"
@@ -364,7 +364,7 @@
             android:layout_marginEnd="1dp"
             android:layout_marginBottom="1dp"
             android:backgroundTint="#DAD8D8"
-            android:contentDescription="1/x"
+            android:contentDescription="inverse"
             android:text="1/x"
             android:textColor="#000000"
             android:textSize="18sp"
@@ -569,14 +569,14 @@
             android:text="log"
             android:textColor="#000000"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/lnBtn"
+            app:layout_constraintBottom_toTopOf="@+id/ln2Btn"
             app:layout_constraintEnd_toStartOf="@+id/num1"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/x10btn" />
 
         <Button
-            android:id="@+id/lnBtn"
+            android:id="@+id/ln2Btn"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="1dp"
@@ -847,7 +847,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/num0"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/lnBtn"
+            app:layout_constraintStart_toEndOf="@+id/ln2Btn"
             app:layout_constraintTop_toBottomOf="@+id/num1" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
