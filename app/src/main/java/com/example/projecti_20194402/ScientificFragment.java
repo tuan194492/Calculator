@@ -84,6 +84,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
+        System.out.println(ngoac);
         if (calculator.getCurrentNumber().equals("NaN") || calculator.getCurrentNumber().contains("Infinity")) {
             calculator.setScope(SCOPE.BEFORE_COMPUTE);
         }
@@ -144,6 +145,10 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
             if (calculator.getCurrentNumber().contains(".") && v.getId() == R.id.dotBtn) return;
             if (calculator.getCurrentNumber().contains(".") == false && v.getId() == R.id.num0 && Float.parseFloat(calculator.getCurrentNumber()) == 0.0f) return;
             if (calculator.getScope() == SCOPE.PHEPTOANDON) return;
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
+                calculator.buttonCclick();
+                ngoac = 0;
+            }
             calculator.appendNumber(v.getContentDescription().toString());
             updateDisplay();
             return;
@@ -195,8 +200,10 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         // Ấn nút =
         if (v.getId() == R.id.computeBtn) {
             if (ngoac > 0) {
-                calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
-                calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                if (calculator.getExpression().charAt(calculator.getExpression().length() - 1) != ')') {
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator() + beautifyNumber(calculator.getCurrentNumber()));
+                }
                 while (ngoac > 0) {
                     calculator.setExpression(calculator.getExpression() + ")");
                     calculator.setS_Expression(calculator.getS_Expression() + ")");
