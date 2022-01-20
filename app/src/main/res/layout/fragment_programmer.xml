@@ -324,7 +324,7 @@
         app:layout_constraintWidth="match_parent">
 
         <ImageButton
-            android:id="@+id/imageButton5"
+            android:id="@+id/programmerBitwise_btn"
             android:layout_width="95dp"
             android:layout_height="49dp"
             android:contentDescription="a"
@@ -342,7 +342,7 @@
             android:contentDescription="a"
             android:src="@drawable/bitshift_programmer"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageButton5"
+            app:layout_constraintStart_toEndOf="@+id/programmerBitwise_btn"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.529"
             app:layout_constraintWidth_percent="0.2" />
@@ -479,6 +479,7 @@
             android:id="@+id/programmerShiftLeft_btn"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:contentDescription="Lsh"
             android:paddingLeft="0dp"
             android:paddingTop="0dp"
             android:paddingRight="0dp"
@@ -498,6 +499,7 @@
             android:id="@+id/programmerShiftRight_btn"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:contentDescription="Rsh"
             android:paddingLeft="0dp"
             android:paddingTop="0dp"
             android:paddingRight="0dp"
@@ -949,6 +951,104 @@
             app:layout_constraintTop_toBottomOf="@+id/programmerAdd_btn"
             app:layout_constraintWidth_default="percent"
             app:layout_constraintWidth_percent="0.19" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bitwiseLayout"
+            android:layout_width="286dp"
+            android:layout_height="128dp"
+            android:background="@drawable/border"
+            android:paddingTop="1dp"
+            android:paddingEnd="1dp"
+            android:paddingRight="1dp"
+            android:paddingBottom="1dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/programmerAnd_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#222020"
+                android:contentDescription="AND"
+                android:text="AND"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/programmerNand_btn"
+                app:layout_constraintEnd_toStartOf="@+id/programmerOr_btn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/programmerOr_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#222020"
+                android:contentDescription="OR"
+                android:text="OR"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/programmerNor_btn"
+                app:layout_constraintEnd_toStartOf="@+id/programmerNot_btn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/programmerAnd_btn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/programmerNot_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#222020"
+                android:contentDescription="NOT"
+                android:text="NOT"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@+id/programmerXor_btn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/programmerOr_btn"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/programmerNand_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#222020"
+                android:contentDescription="NAND"
+                android:text="NAND"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/programmerNor_btn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/programmerAnd_btn" />
+
+            <Button
+                android:id="@+id/programmerNor_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#222020"
+                android:contentDescription="NOR"
+                android:text="NOR"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/programmerXor_btn"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/programmerNand_btn"
+                app:layout_constraintTop_toBottomOf="@+id/programmerOr_btn" />
+
+            <Button
+                android:id="@+id/programmerXor_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#222020"
+                android:contentDescription="XOR"
+                android:text="XOR"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/programmerNor_btn"
+                app:layout_constraintTop_toBottomOf="@+id/programmerNot_btn" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

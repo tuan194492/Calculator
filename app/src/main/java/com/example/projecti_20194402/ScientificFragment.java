@@ -71,6 +71,17 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         getView().findViewById(R.id.squareBtn).setOnClickListener(this);
         getView().findViewById(R.id.rootBtn).setOnClickListener(this);
         getView().findViewById(R.id.inverseBtn).setOnClickListener(this);
+        getView().findViewById(R.id.sinBtn).setOnClickListener(this);
+        getView().findViewById(R.id.cosBtn).setOnClickListener(this);
+        getView().findViewById(R.id.tanBtn).setOnClickListener(this);
+        getView().findViewById(R.id.cotBtn).setOnClickListener(this);
+        getView().findViewById(R.id.fncAbsBtn).setOnClickListener(this);
+        getView().findViewById(R.id.fnCeilBtn).setOnClickListener(this);
+        getView().findViewById(R.id.fnFloorBtn).setOnClickListener(this);
+        getView().findViewById(R.id.randBtn).setOnClickListener(this);
+        getView().findViewById(R.id.piBtn).setOnClickListener(this);
+        getView().findViewById(R.id.eBtn).setOnClickListener(this);
+        getView().findViewById(R.id.psBtn).setOnClickListener(this);
         // Đã xong + - * / đóng mở ngoặc với cả số nguyên và số thực
         getView().findViewById(R.id.absBtn).setOnClickListener(this);
         getView().setOnClickListener(this);
@@ -85,8 +96,26 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v) {
         System.out.println(ngoac);
+        // Del CE C
+        if (v.getId() == R.id.cBtn) {
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE)
+                calculator.buttonCEclick();
+            if (calculator.getCurrentNumber().equals("0"))
+                calculator.buttonCclick();
+            else
+                calculator.buttonCEclick();
+            updateDisplay();
+            return;
+        }
+        else if (v.getId() == R.id.deleteBtn) {
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE || calculator.getScope() == SCOPE.PHEPTOANDON || calculator.getScope() == SCOPE.OPERATOR || calculator.getScope() == SCOPE.NGOAC) return;
+            calculator.buttonDel();
+            updateDisplay();
+            return;
+        }
+        // NUMBER
         if (calculator.getCurrentNumber().equals("NaN") || calculator.getCurrentNumber().contains("Infinity")) {
-            calculator.setScope(SCOPE.BEFORE_COMPUTE);
+            return;
         }
         System.out.println(calculator.getExpression());
         System.out.println(calculator.getS_Expression());
@@ -111,24 +140,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
         } else {
             functionView.setVisibility(View.GONE);
         }
-        // Del CE C
-        if (v.getId() == R.id.cBtn) {
-            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE)
-                calculator.buttonCEclick();
-            if (calculator.getCurrentNumber().equals("0"))
-                calculator.buttonCclick();
-            else
-                calculator.buttonCEclick();
-            updateDisplay();
-            return;
-        }
-        else if (v.getId() == R.id.deleteBtn) {
-            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE || calculator.getScope() == SCOPE.PHEPTOANDON || calculator.getScope() == SCOPE.OPERATOR || calculator.getScope() == SCOPE.NGOAC) return;
-            calculator.buttonDel();
-            updateDisplay();
-            return;
-        }
-        // NUMBER
+
         if (    v.getId() == R.id.num0
                 || v.getId() == R.id.num1
                 || v.getId() == R.id.num2
@@ -161,6 +173,7 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
             || v.getId() == R.id.exponentBtn) {
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 calculator.setExpression(calculator.getCurrentNumber());
+                calculator.setS_Expression("(" + calculator.getS_Expression() + ")");
                 calculator.setOperator(v.getContentDescription().charAt(0));
                 calculator.setCurrentNumber("0");
             } else if (calculator.getScope() == SCOPE.OPERATOR) {
@@ -350,6 +363,30 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                         case R.id.rootBtn:
                             addIn = "sqrt";
                             break;
+                        case R.id.squareBtn:
+                            addIn = "sqr";
+                            break;
+                        case R.id.sinBtn:
+                            addIn = "sin";
+                            break;
+                        case R.id.cosBtn:
+                            addIn = "cos";
+                            break;
+                        case R.id.tanBtn:
+                            addIn = "tan";
+                            break;
+                        case R.id.cotBtn:
+                            addIn = "cot";
+                            break;
+                        case R.id.fncAbsBtn:
+                            addIn = "abs";
+                            break;
+                        case R.id.fnCeilBtn:
+                            addIn = "ceil";
+                            break;
+                        case R.id.fnFloorBtn:
+                            addIn = "floor";
+                            break;
                     }
                     String curNum =  beautifyNumber(String.valueOf(calculator.unaryOperationCal(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression()))))), addIn)));
                     calculator.setExpression(calculator.getExpression().substring(0, calculator.findLastSubExpression(calculator.getExpression()))
@@ -401,6 +438,76 @@ public class ScientificFragment extends Fragment implements View.OnClickListener
                     calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "sqrt"));
                     expressionTextView.setText(calculator.getS_Expression());
                     break;
+                case R.id.squareBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "sqr(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "sqr"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.sinBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "sin(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "sin"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.cosBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "cos(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "cos"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.tanBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "tan(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "tan"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.cotBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "cot(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "cot"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+
+                case R.id.fncAbsBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "abs(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "abs"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.fnCeilBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "ceil(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "ceil"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.fnFloorBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "floor(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "floor"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.psBtn:
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator()+ "negate(" + beautifyNumber(calculator.getCurrentNumber()) + ")");
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator()+ calculator.unaryOperationCal(beautifyNumber(calculator.getCurrentNumber()), "negate"));
+                    expressionTextView.setText(calculator.getS_Expression());
+                    break;
+                case R.id.randBtn:
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator());
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator());
+                    calculator.setCurrentNumber(String.valueOf(Math.random()));
+                    calculator.setScope(SCOPE.NUMBER);
+                    calculator.setOperator(' ');
+                    updateDisplay();
+                    return;
+                case R.id.piBtn:
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator());
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator());
+                    calculator.setCurrentNumber(String.valueOf(Math.PI));
+                    calculator.setScope(SCOPE.NUMBER);
+                    calculator.setOperator(' ');
+                    updateDisplay();
+                    return;
+                case R.id.eBtn:
+                    calculator.setExpression(calculator.getExpression() + calculator.getOperator());
+                    calculator.setS_Expression(calculator.getS_Expression() + calculator.getOperator());
+                    calculator.setCurrentNumber(String.valueOf(Math.E));
+                    calculator.setScope(SCOPE.NUMBER);
+                    calculator.setOperator(' ');
+                    updateDisplay();
+                    return;
             }
             calculator.setCurrentNumber(beautifyNumber(String.valueOf(calculator.unaryOperationCal(calculator.getCurrentNumber(), v.getContentDescription().toString()))));
             currentNumberTextView.setText(calculator.getCurrentNumber());

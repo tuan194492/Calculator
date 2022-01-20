@@ -119,6 +119,8 @@ public class ScientificCalculator {
                 return Float.parseFloat(s) * Float.parseFloat(s);
             case "inverse":
                 return 1/Float.parseFloat(s);
+            case "negate":
+                return -Float.parseFloat(s);
         }
         return 0;
     }

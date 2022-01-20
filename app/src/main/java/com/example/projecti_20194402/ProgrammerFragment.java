@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -18,10 +19,18 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
     String operator;
     ProgrammerCalculator calculator;
     int ngoac;
+    private enum BASE {
+        BIN,
+        OCT,
+        DEC,
+        HEX
+    }
+    BASE base;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         calculator = new ProgrammerCalculator();
+        base = BASE.DEC;
         ngoac = 0;
     }
 
@@ -36,7 +45,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        getActivity().findViewById(R.id.bitwiseLayout).setVisibility(View.GONE);
         number = getActivity().findViewById(R.id.programmerNumber);
         number.setText("0");
         expression = getActivity().findViewById(R.id.programmerExpress);
@@ -59,6 +68,14 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
         getActivity().findViewById(R.id.programmerSubtract_btn).setOnClickListener(this);
         getActivity().findViewById(R.id.programmerMul_btn).setOnClickListener(this);
         getActivity().findViewById(R.id.programmerDiv_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerPercent_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerShiftLeft_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerShiftRight_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerAnd_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerNand_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerOr_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerNor_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerXor_btn).setOnClickListener(this);
         // Compute
         getActivity().findViewById(R.id.programmerCompute_btn).setOnClickListener(this);
         //dong mo ngoac
@@ -67,6 +84,8 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
         // Delete and clear
         getActivity().findViewById(R.id.programmerDelete_btn).setOnClickListener(this);
         getActivity().findViewById(R.id.programmerClear_btn).setOnClickListener(this);
+        // Bitwise
+        getActivity().findViewById(R.id.programmerBitwise_btn).setOnClickListener(this);
 
     }
 
@@ -74,6 +93,17 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         if (calculator.getCurNum().equals("NaN") || calculator.getCurNum().contains("Infinity")) {
             calculator.setScope(SCOPE.BEFORE_COMPUTE);
+        }
+        View layout = getActivity().findViewById(R.id.bitwiseLayout);
+        if (v.getId() == R.id.programmerBitwise_btn) {
+
+            if (layout.getVisibility() == View.VISIBLE) {
+                layout.setVisibility(View.GONE);
+            } else {
+                layout.setVisibility(View.VISIBLE);
+            }
+        } else {
+            layout.setVisibility(View.GONE);
         }
         //Delete and clear
         if (v.getId() == R.id.programmerDelete_btn) {
@@ -100,30 +130,39 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                 calculator.reset();
             } else if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') return;
             calculator.appendNumber(v.getContentDescription().toString());
-            calculator.setOperator(' ');
+            calculator.setOperator(" ");
             calculator.setScope(SCOPE.NUMBER);
         }
         // Operator
         if (    v.getId() == R.id.programmerAdd_btn
             ||  v.getId() == R.id.programmerSubtract_btn
             ||  v.getId() == R.id.programmerMul_btn
-            ||  v.getId() == R.id.programmerDiv_btn) {
+            ||  v.getId() == R.id.programmerDiv_btn
+            ||  v.getId() == R.id.programmerPercent_btn
+            ||  v.getId() == R.id.programmerShiftLeft_btn
+            ||  v.getId() == R.id.programmerShiftRight_btn
+            ||  v.getId() == R.id.programmerAnd_btn
+            ||  v.getId() == R.id.programmerOr_btn
+            ||  v.getId() == R.id.programmerNor_btn
+            ||  v.getId() == R.id.programmerXor_btn
+            ||  v.getId() == R.id.programmerNand_btn
+        ) {
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 calculator.setCurNum(beautifyNumber(number.getText().toString()));
                 calculator.setExpression(calculator.getCurNum());
             } else if (calculator.getScope() == SCOPE.NUMBER) {
-                if (calculator.getOperator() != ' ')
+                if (calculator.getOperator() != " ")
                     calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
                 else
                     calculator.setExpression(calculator.getExpression() + beautifyNumber(calculator.getCurNum()));
             } else if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == '(') {
                 return;
             }
-            calculator.setOperator(v.getContentDescription().charAt(0));
+            calculator.setOperator(v.getContentDescription().toString());
             calculator.setCurNum("0");
             calculator.setScope(SCOPE.OPERATOR);
             expression.setText(calculator.getExpression() + calculator.getOperator());
-            if ((calculator.getOperator() == '+' || calculator.getOperator() == '-') && ngoac == 0)
+            if ((calculator.getOperator() == "+" || calculator.getOperator() == "-") && ngoac == 0)
                 number.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
             else
                 number.setText(beautifyNumber(calculator.getCurNum()));
@@ -141,7 +180,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                 }
                 calculator.setScope(SCOPE.NGOAC);
                 calculator.setCurNum("0");
-                calculator.setOperator(' ');
+                calculator.setOperator(" ");
             }
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 return;
@@ -163,7 +202,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                 } else if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') return;
                 calculator.setExpression(calculator.getExpression() + calculator.getOperator() + "(");
                 calculator.setCurNum("0");
-                calculator.setOperator(' ');
+                calculator.setOperator(" ");
                 calculator.setScope(SCOPE.NGOAC);
                 ngoac++;
             } else {
@@ -175,7 +214,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                     calculator.setExpression(calculator.getExpression() + beautifyNumber(calculator.getCurNum()));
                 }
                 calculator.setExpression(calculator.getExpression() + ")");
-                calculator.setOperator(' ');
+                calculator.setOperator(" ");
                 calculator.setCurNum("0");
                 calculator.setScope(SCOPE.NGOAC);
                 ngoac--;
