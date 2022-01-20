@@ -1,5 +1,6 @@
 package com.example.projecti_20194402;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Locale;
 import java.util.function.BinaryOperator;
 
 public class ProgrammerFragment extends Fragment implements View.OnClickListener {
@@ -19,6 +21,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
     String operator;
     ProgrammerCalculator calculator;
     int ngoac;
+    TextView hexTextView, binTextView, octTextView, decTextView;
     private enum BASE {
         BIN,
         OCT,
@@ -45,12 +48,22 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        hexTextView = (TextView) getActivity().findViewById(R.id.hexTextView);
+        octTextView = (TextView) getActivity().findViewById(R.id.octTextView);
+        decTextView = (TextView) getActivity().findViewById(R.id.decTextView);
+        binTextView = (TextView) getActivity().findViewById(R.id.binTextView);
+
         getActivity().findViewById(R.id.bitwiseLayout).setVisibility(View.GONE);
         number = getActivity().findViewById(R.id.programmerNumber);
-        number.setText("0");
         expression = getActivity().findViewById(R.id.programmerExpress);
-        expression.setText("");
-
+//        number.setText("0");
+//        expression.setText("");
+        //BASE
+        getActivity().findViewById(R.id.programmerHEX).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerDEC).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerOCT).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerBIN).setOnClickListener(this);
         //Number
         getActivity().findViewById(R.id.programmerNum0_btn).setOnClickListener(this);
         getActivity().findViewById(R.id.programmerNum1_btn).setOnClickListener(this);
@@ -86,7 +99,8 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
         getActivity().findViewById(R.id.programmerClear_btn).setOnClickListener(this);
         // Bitwise
         getActivity().findViewById(R.id.programmerBitwise_btn).setOnClickListener(this);
-
+        //
+        updateDisplay();
     }
 
     @Override
@@ -104,6 +118,23 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             }
         } else {
             layout.setVisibility(View.GONE);
+        }
+        //BASE
+        if (   v.getId() == R.id.programmerHEX
+           ||  v.getId() == R.id.programmerOCT
+           ||  v.getId() == R.id.programmerBIN
+           ||  v.getId() == R.id.programmerDEC
+        ) {
+            if (v.getId() == R.id.programmerHEX) base = BASE.HEX;
+            else if (v.getId() == R.id.programmerBIN) base = BASE.BIN;
+            else if (v.getId() == R.id.programmerDEC) base = BASE.DEC;
+            else if (v.getId() == R.id.programmerOCT) base = BASE.OCT;
+            getActivity().findViewById(R.id.programmerHEX).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerDEC).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerOCT).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerBIN).setBackgroundColor(0);
+            getActivity().findViewById(v.getId()).setBackgroundColor(Color.parseColor("#C66F6F"));
+            return;
         }
         //Delete and clear
         if (v.getId() == R.id.programmerDelete_btn) {
@@ -166,6 +197,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                 number.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
             else
                 number.setText(beautifyNumber(calculator.getCurNum()));
+            updateBaseDisplay();
             return;
         }
         // Compute
@@ -192,6 +224,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             calculator.setScope(SCOPE.BEFORE_COMPUTE);
             expression.setText(calculator.getExpression() + "=");
             number.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
+            updateBaseDisplay();
             return;
         }
         if (v.getId() == R.id.programmerMoNgoac_btn || v.getId() == R.id.programmerDongNgoac_btn) {
@@ -222,6 +255,7 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                 number.setText(beautifyNumber(String.valueOf(calculator.cal(
                         calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression())
                 )))));
+                updateBaseDisplay();
                 return;
             }
         }
@@ -238,9 +272,18 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             return String.valueOf(Float.parseFloat(s));
         else return String.valueOf((int) Float.parseFloat(s));
     }
+    public void updateBaseDisplay() {
+        int num = Integer.parseInt(number.getText().toString());
+        binTextView.setText(Integer.toBinaryString(num));
+        octTextView.setText(Integer.toOctalString(num));
+        decTextView.setText(number.getText().toString());
+        hexTextView.setText(Integer.toHexString(num).toUpperCase(Locale.ROOT));
+    }
     public void updateDisplay() {
         number.setText(beautifyNumber(calculator.getCurNum()));
         expression.setText(calculator.getExpression() + calculator.getOperator());
+        updateBaseDisplay();
+
     }
 
 }
