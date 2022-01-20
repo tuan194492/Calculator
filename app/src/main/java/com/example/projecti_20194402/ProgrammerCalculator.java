@@ -4,20 +4,102 @@ import java.util.Stack;
 
 public class ProgrammerCalculator {
     private SCOPE scope;
-    private String curNum;
+    private String curNum; // So hien tai, luon o he co so 10
     private String expression;
+    private String binExpression;
+    private String octExpression;
+    private String hexExpression;
+    private String binNum;
+    private String octNum;
+    private String hexNum;
     private String operator;
+    private BASE base;
+
+    public BASE getBase() {
+        return base;
+    }
+
+    public void setBase(BASE base) {
+        this.base = base;
+    }
+
+    public void setCurNum(String curNum) {
+        this.curNum = curNum;
+    }
+
+    public String getBinNum() {
+        return binNum;
+    }
+
+    public void setBinNum(String binNum) {
+        this.binNum = binNum;
+    }
+
+    public String getOctNum() {
+        return octNum;
+    }
+
+    public void setOctNum(String octNum) {
+        this.octNum = octNum;
+    }
+
+    public String getHexNum() {
+        return hexNum;
+    }
+
+    public void setHexNum(String hexNum) {
+        this.hexNum = hexNum;
+    }
+
+    public String getBinExpression() {
+        return binExpression;
+    }
+
+    public void setBinExpression(String binExpression) {
+        this.binExpression = binExpression;
+    }
+
+    public String getOctExpression() {
+        return octExpression;
+    }
+
+    public void setOctExpression(String octExpression) {
+        this.octExpression = octExpression;
+    }
+
+    public String getHexExpression() {
+        return hexExpression;
+    }
+
+    public void setHexExpression(String hexExpression) {
+        this.hexExpression = hexExpression.toUpperCase();
+    }
+
     public ProgrammerCalculator() {
         scope = SCOPE.NUMBER;
         curNum = "0";
+        binNum = "0";
+        octNum = "0";
+        hexNum = "0";
         expression = "";
         operator = " ";
+        binExpression = " ";
+        octExpression = " ";
+        hexExpression = " ";
+        base = BASE.DEC;
     }
     public void reset() {
         scope = SCOPE.NUMBER;
         curNum = "0";
+        binNum = "0";
+        octNum = "0";
+        hexNum = "0";
         expression = "";
         operator = " ";
+        binExpression = " ";
+        octExpression = " ";
+        hexExpression = " ";
+        base = BASE.DEC;
     }
     public int findLastSubExpression(String s) {
         int vitri = 0;
@@ -43,12 +125,54 @@ public class ProgrammerCalculator {
     public String getCurNum() {
         return curNum;
     }
+    public String getCurNumber() {
+        switch (base) {
+            case BIN:
+                return binNum;
+            case OCT:
+                return octNum;
+            case DEC:
+                return curNum;
+            case HEX:
+                return hexNum;
+        }
+        return "e";
+    }
 
-    public void setCurNum(String curNum) {
-        this.curNum = curNum;
+    public void setCurNumber(String s) {
+        switch (base) {
+            case BIN:
+                binNum = s;
+                return;
+            case OCT:
+                octNum = s;
+                return;
+            case DEC:
+                curNum = s;
+                return;
+            case HEX:
+                hexNum = s;
+                return;
+        }
     }
 
     public String getExpression() {
+        switch (base) {
+            case BIN:
+                return binExpression;
+            case OCT:
+                return octExpression;
+            case DEC:
+                return expression;
+            case HEX:
+                return hexExpression;
+        }
+        return expression;
+    }
+    public String getExpression(int base) {
+        if (base == 2) return binExpression;
+        if (base == 8) return octExpression;
+        if (base == 16) return hexExpression;
         return expression;
     }
 
@@ -68,16 +192,51 @@ public class ProgrammerCalculator {
         return intEvaluate.evaluate(s);
     }
     public void appendNumber(String s) {
-        if (curNum.contains(".")) {
-            if (s.equals(".")) return;
+        switch (base) {
+            case BIN:
+                binNum = binNum + s;
+                return;
+            case OCT:
+                octNum = octNum + s;
+                return;
+            case DEC:
+                curNum = curNum + s;
+                return;
+            case HEX:
+                hexNum = hexNum + s;
+                return;
         }
-        curNum = curNum + s;
     }
     public void buttonDel() {
-        if (curNum.length() <= 1) {
-            curNum = "0";
-        } else {
-            curNum = curNum.substring(0, curNum.length() - 1);
+        switch (base) {
+            case BIN:
+                if (binNum.length() <= 1) {
+                    binNum = "0";
+                } else {
+                    binNum = binNum.substring(0, binNum.length() - 1);
+                }
+                return;
+            case OCT:
+                if (octNum.length() <= 1) {
+                    octNum = "0";
+                } else {
+                    octNum = octNum.substring(0, octNum.length() - 1);
+                }
+                return;
+            case DEC:
+                if (curNum.length() <= 1) {
+                    curNum = "0";
+                } else {
+                    curNum = curNum.substring(0, curNum.length() - 1);
+                }
+                return;
+            case HEX:
+                if (hexNum.length() <= 1) {
+                    hexNum = "0";
+                } else {
+                    hexNum = hexNum.substring(0, hexNum.length() - 1);
+                }
+                return;
         }
     }
     private static class intEvaluate {

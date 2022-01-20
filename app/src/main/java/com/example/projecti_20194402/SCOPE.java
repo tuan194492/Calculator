@@ -5,5 +5,6 @@ public enum SCOPE {
     OPERATOR,
     BEFORE_COMPUTE, // trang thai ngay sau khi vua tinh toan
     NGOAC,
-    PHEPTOANDON
+    PHEPTOANDON,
+    BASE
 }

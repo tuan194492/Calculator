@@ -22,18 +22,10 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
     ProgrammerCalculator calculator;
     int ngoac;
     TextView hexTextView, binTextView, octTextView, decTextView;
-    private enum BASE {
-        BIN,
-        OCT,
-        DEC,
-        HEX
-    }
-    BASE base;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         calculator = new ProgrammerCalculator();
-        base = BASE.DEC;
         ngoac = 0;
     }
 
@@ -75,6 +67,12 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
         getActivity().findViewById(R.id.programmerNum7_btn).setOnClickListener(this);
         getActivity().findViewById(R.id.programmerNum8_btn).setOnClickListener(this);
         getActivity().findViewById(R.id.programmerNum9_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerA_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerB_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerC_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerD_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerE_btn).setOnClickListener(this);
+        getActivity().findViewById(R.id.programmerF_btn).setOnClickListener(this);
 //        getActivity().findViewById(R.id.programmerDot_btn).setOnClickListener(this);
         //Operator
         getActivity().findViewById(R.id.programmerAdd_btn).setOnClickListener(this);
@@ -125,15 +123,19 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
            ||  v.getId() == R.id.programmerBIN
            ||  v.getId() == R.id.programmerDEC
         ) {
-            if (v.getId() == R.id.programmerHEX) base = BASE.HEX;
-            else if (v.getId() == R.id.programmerBIN) base = BASE.BIN;
-            else if (v.getId() == R.id.programmerDEC) base = BASE.DEC;
-            else if (v.getId() == R.id.programmerOCT) base = BASE.OCT;
+            if (v.getId() == R.id.programmerHEX) calculator.setBase(BASE.HEX);
+            else if (v.getId() == R.id.programmerBIN) calculator.setBase(BASE.BIN);
+            else if (v.getId() == R.id.programmerDEC) calculator.setBase(BASE.DEC);
+            else if (v.getId() == R.id.programmerOCT) calculator.setBase(BASE.OCT);
             getActivity().findViewById(R.id.programmerHEX).setBackgroundColor(0);
             getActivity().findViewById(R.id.programmerDEC).setBackgroundColor(0);
             getActivity().findViewById(R.id.programmerOCT).setBackgroundColor(0);
             getActivity().findViewById(R.id.programmerBIN).setBackgroundColor(0);
             getActivity().findViewById(v.getId()).setBackgroundColor(Color.parseColor("#C66F6F"));
+            updateDisplay();
+            if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
+                expression.setText(expression.getText() + "=");
+            }
             return;
         }
         //Delete and clear
@@ -142,6 +144,10 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
         }
         if (v.getId() == R.id.programmerClear_btn) {
             calculator.reset();
+            getActivity().findViewById(R.id.programmerHEX).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerDEC).setBackgroundColor(Color.parseColor("#C66F6F"));
+            getActivity().findViewById(R.id.programmerOCT).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerBIN).setBackgroundColor(0);
         }
         // Number
         if (   v.getId() == R.id.programmerNum0_btn
@@ -154,12 +160,47 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             || v.getId() == R.id.programmerNum7_btn
             || v.getId() == R.id.programmerNum8_btn
             || v.getId() == R.id.programmerNum9_btn
+            || v.getId() == R.id.programmerA_btn
+            || v.getId() == R.id.programmerB_btn
+            || v.getId() == R.id.programmerC_btn
+            || v.getId() == R.id.programmerD_btn
+            || v.getId() == R.id.programmerE_btn
+            || v.getId() == R.id.programmerF_btn
         ) {
             if (calculator.getScope() == SCOPE.OPERATOR) {
-                calculator.setExpression(calculator.getExpression() + calculator.getOperator());
+                calculator.setBinExpression(calculator.getExpression(2) + calculator.getOperator());
+                calculator.setOctExpression(calculator.getExpression(8) + calculator.getOperator());
+                calculator.setExpression(calculator.getExpression(10) + calculator.getOperator());
+                calculator.setHexExpression(calculator.getExpression(16) + calculator.getOperator());
             } else if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 calculator.reset();
             } else if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') return;
+            if (calculator.getBase() == BASE.DEC && v.getContentDescription().charAt(0) > '9') return;
+            if (calculator.getBase() == BASE.OCT && v.getContentDescription().charAt(0) > '7') return;
+            if (calculator.getBase() == BASE.BIN && v.getContentDescription().charAt(0) > '1') return;
+//            if (calculator.getScope() == SCOPE.BASE) {
+//                calculator.setCurNum("0");
+//                calculator.setBinNum("0");
+//                calculator.setOctNum("0");
+//                calculator.setHexNum("0");
+//            }
+            switch (calculator.getBase()) {
+                case BIN:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 2)));
+                    break;
+                case OCT:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 8)));
+                    break;
+                case DEC:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 10)));
+                    break;
+                case HEX:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 16)));
+                    break;
+            }
+            calculator.setBinNum(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
             calculator.appendNumber(v.getContentDescription().toString());
             calculator.setOperator(" ");
             calculator.setScope(SCOPE.NUMBER);
@@ -179,51 +220,149 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             ||  v.getId() == R.id.programmerNand_btn
         ) {
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
-                calculator.setCurNum(beautifyNumber(number.getText().toString()));
+                switch (calculator.getBase()) {
+                    case BIN:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 2)));
+                        break;
+                    case OCT:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 8)));
+                        break;
+                    case DEC:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 10)));
+                        break;
+                    case HEX:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 16)));
+                        break;
+                }
                 calculator.setExpression(calculator.getCurNum());
+                calculator.setBinExpression(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+                calculator.setOctExpression(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+                calculator.setHexExpression(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
             } else if (calculator.getScope() == SCOPE.NUMBER) {
-                if (calculator.getOperator() != " ")
-                    calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
-                else
-                    calculator.setExpression(calculator.getExpression() + beautifyNumber(calculator.getCurNum()));
+                switch (calculator.getBase()) {
+                    case BIN:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 2)));
+                        break;
+                    case OCT:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 8)));
+                        break;
+                    case DEC:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 10)));
+                        break;
+                    case HEX:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 16)));
+                        break;
+                }
+                calculator.setBinNum(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+                calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+                calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
+                if (calculator.getOperator() != " ") {
+                    calculator.setExpression(calculator.getExpression(10) + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
+                    calculator.setOctExpression(calculator.getOctExpression() + calculator.getOperator() + beautifyNumber(calculator.getOctNum()));
+                    calculator.setBinExpression(calculator.getBinExpression() + calculator.getOperator() + beautifyNumber(calculator.getBinNum()));
+                    calculator.setHexExpression(calculator.getHexExpression() + calculator.getOperator() + beautifyNumber(calculator.getHexNum().toUpperCase()));
+
+                }
+                else {
+                    calculator.setExpression(calculator.getExpression(10) + beautifyNumber(calculator.getCurNum()));
+                    calculator.setOctExpression(calculator.getOctExpression() + beautifyNumber(calculator.getOctNum()));
+                    calculator.setBinExpression(calculator.getBinExpression() + beautifyNumber(calculator.getBinNum()));
+                    calculator.setHexExpression(calculator.getHexExpression() + beautifyNumber(calculator.getHexNum().toUpperCase()));
+                }
             } else if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == '(') {
                 return;
             }
             calculator.setOperator(v.getContentDescription().toString());
             calculator.setCurNum("0");
+            calculator.setOctNum("0");
+            calculator.setHexNum("0");
+            calculator.setBinNum("0");
             calculator.setScope(SCOPE.OPERATOR);
             expression.setText(calculator.getExpression() + calculator.getOperator());
-            if ((calculator.getOperator() == "+" || calculator.getOperator() == "-") && ngoac == 0)
-                number.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
+            if ((calculator.getOperator() == "+" || calculator.getOperator() == "-") && ngoac == 0) {
+                int res = calculator.cal(calculator.getExpression(10));
+                switch (calculator.getBase()) {
+                    case DEC:
+                        number.setText(beautifyNumber(String.valueOf(res)));
+                        break;
+                    case BIN:
+                        number.setText(beautifyNumber(String.valueOf(Integer.toBinaryString(res))));
+                        break;
+                    case OCT:
+                        number.setText(beautifyNumber(String.valueOf(Integer.toOctalString(res))));
+                        break;
+                    case HEX:
+                        number.setText(beautifyNumber(String.valueOf(Integer.toHexString(res))));
+                        break;
+                }
+            }
             else
-                number.setText(beautifyNumber(calculator.getCurNum()));
+                number.setText(beautifyNumber(calculator.getCurNumber()));
             updateBaseDisplay();
             return;
         }
         // Compute
         if (v.getId() == R.id.programmerCompute_btn) {
+            switch (calculator.getBase()) {
+                case BIN:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 2)));
+                    break;
+                case OCT:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 8)));
+                    break;
+                case DEC:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 10)));
+                    break;
+                case HEX:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 16)));
+                    break;
+            }
+            calculator.setBinNum(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
             if (ngoac > 0) {
                 if (calculator.getExpression().charAt(calculator.getExpression().length() - 1) != ')') {
-                    calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
+                    calculator.setExpression(calculator.getExpression(10) + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
+                    calculator.setBinExpression(calculator.getExpression(2) + calculator.getOperator() + beautifyNumber(calculator.getBinNum()));
+                    calculator.setOctExpression(calculator.getExpression(8) + calculator.getOperator() + beautifyNumber(calculator.getOctNum()));
+                    calculator.setHexExpression(calculator.getExpression(16) + calculator.getOperator() + beautifyNumber(calculator.getHexNum()));
                 }
                 while (ngoac > 0) {
-                    calculator.setExpression(calculator.getExpression() + ")");
+                    calculator.setExpression(calculator.getExpression(10) + ")");
+                    calculator.setBinExpression(calculator.getExpression(2) + ")");
+                    calculator.setOctExpression(calculator.getExpression(8) + ")");
+                    calculator.setHexExpression(calculator.getExpression(16) + ")");
                     ngoac--;
                 }
                 calculator.setScope(SCOPE.NGOAC);
                 calculator.setCurNum("0");
+                calculator.setOctNum("0");
+                calculator.setHexNum("0");
+                calculator.setBinNum("0");
                 calculator.setOperator(" ");
             }
             if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                 return;
             } else if (calculator.getScope() == SCOPE.NUMBER ) {
-                calculator.setExpression(calculator.getExpression() + beautifyNumber(calculator.getCurNum()));
+                calculator.setExpression(calculator.getExpression(10) + beautifyNumber(calculator.getCurNum())); // expression = expression + so hien tai
+                calculator.setBinExpression(calculator.getExpression(2) + beautifyNumber(calculator.getBinNum()));
+                calculator.setOctExpression(calculator.getExpression(8) + beautifyNumber(calculator.getOctNum()));
+                calculator.setHexExpression(calculator.getExpression(16) + beautifyNumber(calculator.getHexNum()));
+
             } else if (calculator.getScope() == SCOPE.OPERATOR) {
-                calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
+                calculator.setExpression(calculator.getExpression(10) + calculator.getOperator() + beautifyNumber(calculator.getCurNum())); // expression = expression + op + number
+                calculator.setBinExpression(calculator.getExpression(2) + calculator.getOperator() + beautifyNumber(calculator.getBinNum()));
+                calculator.setOctExpression(calculator.getExpression(8) + calculator.getOperator() + beautifyNumber(calculator.getOctNum()));
+                calculator.setHexExpression(calculator.getExpression(16) + calculator.getOperator() + beautifyNumber(calculator.getHexNum()));
             }
             calculator.setScope(SCOPE.BEFORE_COMPUTE);
             expression.setText(calculator.getExpression() + "=");
-            number.setText(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression()))));
+            calculator.setCurNum(beautifyNumber(String.valueOf(calculator.cal(calculator.getExpression(10))))); // Number luon chi co mot
+            calculator.setBinNum(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
+            number.setText(beautifyNumber(calculator.getCurNumber()));
+//            calculator.setCurNum(number.getText().toString(), getBase(base));
             updateBaseDisplay();
             return;
         }
@@ -233,54 +372,123 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
                 else if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) {
                     calculator.reset();
                 } else if (calculator.getScope() == SCOPE.NGOAC && calculator.getExpression().charAt(calculator.getExpression().length() - 1) == ')') return;
-                calculator.setExpression(calculator.getExpression() + calculator.getOperator() + "(");
+                calculator.setExpression(calculator.getExpression(10) + calculator.getOperator() + "(");
+                calculator.setBinExpression(calculator.getExpression(2) + calculator.getOperator() + "(");
+                calculator.setOctExpression(calculator.getExpression(8) + calculator.getOperator() + "(");
+                calculator.setHexExpression(calculator.getExpression(16) + calculator.getOperator() + "(");
                 calculator.setCurNum("0");
+                calculator.setBinNum("0");
+                calculator.setOctNum("0");
+                calculator.setHexNum("0");
                 calculator.setOperator(" ");
                 calculator.setScope(SCOPE.NGOAC);
                 ngoac++;
             } else {
+                switch (calculator.getBase()) {
+                    case BIN:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 2)));
+                        break;
+                    case OCT:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 8)));
+                        break;
+                    case DEC:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 10)));
+                        break;
+                    case HEX:
+                        calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 16)));
+                        break;
+                }
+                calculator.setBinNum(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+                calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+                calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
                 if (ngoac <= 0) return;
                 if (calculator.getScope() == SCOPE.BEFORE_COMPUTE) return;
                 else if (calculator.getScope() == SCOPE.OPERATOR) {
-                    calculator.setExpression(calculator.getExpression() + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
+                    calculator.setExpression(calculator.getExpression(10) + calculator.getOperator() + beautifyNumber(calculator.getCurNum()));
+                    calculator.setBinExpression(calculator.getExpression(2) + calculator.getOperator() + beautifyNumber(calculator.getBinNum()));
+                    calculator.setOctExpression(calculator.getExpression(8) + calculator.getOperator() + beautifyNumber(calculator.getOctNum()));
+                    calculator.setHexExpression(calculator.getExpression(16) + calculator.getOperator() + beautifyNumber(calculator.getHexNum()));
                 } else {
-                    calculator.setExpression(calculator.getExpression() + beautifyNumber(calculator.getCurNum()));
+                    calculator.setExpression(calculator.getExpression(10) + beautifyNumber(calculator.getCurNum()));
+                    calculator.setBinExpression(calculator.getExpression(2) + beautifyNumber(calculator.getBinNum()));
+                    calculator.setOctExpression(calculator.getExpression(8) + beautifyNumber(calculator.getOctNum()));
+                    calculator.setHexExpression(calculator.getExpression(16) + beautifyNumber(calculator.getHexNum()));
                 }
-                calculator.setExpression(calculator.getExpression() + ")");
+                calculator.setExpression(calculator.getExpression(10) + ")");
+                calculator.setBinExpression(calculator.getExpression(2) + ")");
+                calculator.setOctExpression(calculator.getExpression(8) + ")");
+                calculator.setHexExpression(calculator.getExpression(16) + ")");
                 calculator.setOperator(" ");
                 calculator.setCurNum("0");
+                calculator.setBinNum("0");
+                calculator.setOctNum("0");
+                calculator.setHexNum("0");
                 calculator.setScope(SCOPE.NGOAC);
                 ngoac--;
                 expression.setText(calculator.getExpression());
-                number.setText(beautifyNumber(String.valueOf(calculator.cal(
-                        calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression())
-                )))));
+                int res = calculator.cal(calculator.getExpression().substring(calculator.findLastSubExpression(calculator.getExpression())));
+                switch (calculator.getBase()) {
+                    case DEC:
+                        number.setText(beautifyNumber(String.valueOf(res)));
+                        break;
+                    case BIN:
+                        number.setText(beautifyNumber(String.valueOf(Integer.toBinaryString(res))));
+                        break;
+                    case OCT:
+                        number.setText(beautifyNumber(String.valueOf(Integer.toOctalString(res))));
+                        break;
+                    case HEX:
+                        number.setText(beautifyNumber(String.valueOf(Integer.toHexString(res))));
+                        break;
+                }
                 updateBaseDisplay();
                 return;
             }
         }
         updateDisplay();
     }
-
     public String beautifyNumber(String s) {
-        if (s.equals("") || s.equals(" ")) return s;
-        if (s.charAt(s.length() - 1) == '.') return beautifyNumber(s.substring(0, s.length() - 1)) + ".";
-        if (Float.parseFloat(s) == 0.0f) {
-            return "0";
+        s = s.toUpperCase();
+        while(s.length() > 1 && s.charAt(0) == '0') {
+            s = s.substring(1);
         }
-        if (Float.parseFloat(s) != (int)(Float.parseFloat(s)))
-            return String.valueOf(Float.parseFloat(s));
-        else return String.valueOf((int) Float.parseFloat(s));
+        try {
+            if (s.equals("") || s.equals(" ")) return s;
+            if (s.charAt(s.length() - 1) == '.') return beautifyNumber(s.substring(0, s.length() - 1)) + ".";
+            if (Float.parseFloat(s) == 0.0f) {
+                return "0";
+            }
+            if (Float.parseFloat(s) != (int)(Float.parseFloat(s)))
+                return String.valueOf(Float.parseFloat(s));
+            else return String.valueOf((int) Float.parseFloat(s));
+        } catch (Exception e) {
+            return s;
+        }
     }
     public void updateBaseDisplay() {
-        int num = Integer.parseInt(number.getText().toString());
+        int radix = 10;
+        switch (calculator.getBase()) {
+            case BIN:
+                radix = 2;
+                break;
+            case DEC:
+                radix = 10;
+                break;
+            case OCT:
+                radix = 8;
+                break;
+            case HEX:
+                radix = 16;
+                break;
+        }
+        int num = Integer.parseInt(number.getText().toString(), radix);
         binTextView.setText(Integer.toBinaryString(num));
         octTextView.setText(Integer.toOctalString(num));
-        decTextView.setText(number.getText().toString());
-        hexTextView.setText(Integer.toHexString(num).toUpperCase(Locale.ROOT));
+        decTextView.setText(String.valueOf(num));
+        hexTextView.setText(Integer.toHexString(num).toUpperCase());
     }
     public void updateDisplay() {
-        number.setText(beautifyNumber(calculator.getCurNum()));
+        number.setText(beautifyNumber(calculator.getCurNumber()));
         expression.setText(calculator.getExpression() + calculator.getOperator());
         updateBaseDisplay();
 
