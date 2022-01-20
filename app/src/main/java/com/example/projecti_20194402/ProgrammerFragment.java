@@ -144,6 +144,10 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
         }
         if (v.getId() == R.id.programmerClear_btn) {
             calculator.reset();
+            getActivity().findViewById(R.id.programmerHEX).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerDEC).setBackgroundColor(Color.parseColor("#C66F6F"));
+            getActivity().findViewById(R.id.programmerOCT).setBackgroundColor(0);
+            getActivity().findViewById(R.id.programmerBIN).setBackgroundColor(0);
         }
         // Number
         if (   v.getId() == R.id.programmerNum0_btn
@@ -174,12 +178,29 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             if (calculator.getBase() == BASE.DEC && v.getContentDescription().charAt(0) > '9') return;
             if (calculator.getBase() == BASE.OCT && v.getContentDescription().charAt(0) > '7') return;
             if (calculator.getBase() == BASE.BIN && v.getContentDescription().charAt(0) > '1') return;
-            if (calculator.getScope() == SCOPE.BASE) {
-                calculator.setCurNum("0");
-                calculator.setBinNum("0");
-                calculator.setOctNum("0");
-                calculator.setHexNum("0");
+//            if (calculator.getScope() == SCOPE.BASE) {
+//                calculator.setCurNum("0");
+//                calculator.setBinNum("0");
+//                calculator.setOctNum("0");
+//                calculator.setHexNum("0");
+//            }
+            switch (calculator.getBase()) {
+                case BIN:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 2)));
+                    break;
+                case OCT:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 8)));
+                    break;
+                case DEC:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 10)));
+                    break;
+                case HEX:
+                    calculator.setCurNum(String.valueOf(Integer.parseInt(calculator.getCurNumber(), 16)));
+                    break;
             }
+            calculator.setBinNum(Integer.toBinaryString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
+            calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
             calculator.appendNumber(v.getContentDescription().toString());
             calculator.setOperator(" ");
             calculator.setScope(SCOPE.NUMBER);
