@@ -362,8 +362,9 @@ public class ProgrammerFragment extends Fragment implements View.OnClickListener
             calculator.setOctNum(Integer.toOctalString(Integer.parseInt(calculator.getCurNum())));
             calculator.setHexNum(Integer.toHexString(Integer.parseInt(calculator.getCurNum())));
             number.setText(beautifyNumber(calculator.getCurNumber()));
+            expression.setText(calculator.getExpression() + "=");
 //            calculator.setCurNum(number.getText().toString(), getBase(base));
-            updateBaseDisplay();
+//            updateBaseDisplay();
             return;
         }
         if (v.getId() == R.id.programmerMoNgoac_btn || v.getId() == R.id.programmerDongNgoac_btn) {
